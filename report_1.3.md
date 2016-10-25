@@ -23,7 +23,7 @@ def switch_ready(datapath_id)
 end
 ```  
 
-このハンドラでは，未登録パケットについてのデフォルト処理を，新たに起動したスイッチのフローテーブルに書き込む動作を行う． 
+このハンドラでは，未登録パケットについてのデフォルト処理を，新たに起動したスイッチのフローテーブルに書き込む動作を行う．  
 ① ```add_bpdu_drop_flow_entry``` メソッドを呼び出し，Table ID:0に，宛先のMACアドレスがマルチキャストアドレスである場合はドロップするという処理を優先度2として登録する．  
 ② ```add_default_broadcast_flow_entry``` メソッドを呼び出し，Table ID:1に，宛先のMACアドレスがブロードキャストアドレスである場合はフラッディングするという処理を優先度3として登録する．  
 ③ ```add_default_flooding_flow_entry``` メソッドを呼び出し，Table ID:1に，コントローラにPacket Inする処理を優先度1として登録する．  
@@ -40,12 +40,12 @@ cookie=0x0, duration=6.49s, table=1, n_packets=1, n_bytes=342, priority=3,dl_dst
 cookie=0x0, duration=6.49s, table=1, n_packets=0, n_bytes=0, priority=1 actions=CONTROLLER:65535
 ```
 
-上記フローテーブルの各行の意味を順に示す．
-1行目：Table ID:0(Filtering Table)において，宛先のMACアドレスがマルチキャストアドレスである場合はドロップする(優先度2)
-2行目：Table ID:0(Filtering Table)において，宛先のMACアドレスがIPv6マルチキャストアドレスである場合はドロップする(優先度2)
-3行目：Table ID:0(Filtering Table)において，Table ID:1(Forwarding Table)へgotoする(優先度1)
-4行目：Table ID:1(Forwarding Table)において，宛先のMACアドレスがブロードキャストアドレスである場合はフラッディングする(優先度3)
-5行目：Table ID:1(Forwarding Table)において，コントローラにPacket Inする(優先度1)
+上記フローテーブルの各行の意味を順に示す． 
+1行目：Table ID:0(Filtering Table)において，宛先のMACアドレスがマルチキャストアドレスである場合はドロップする(優先度2)  
+2行目：Table ID:0(Filtering Table)において，宛先のMACアドレスがIPv6マルチキャストアドレスである場合はドロップする(優先度2)  
+3行目：Table ID:0(Filtering Table)において，Table ID:1(Forwarding Table)へgotoする(優先度1)  
+4行目：Table ID:1(Forwarding Table)において，宛先のMACアドレスがブロードキャストアドレスである場合はフラッディングする(優先度3)  
+5行目：Table ID:1(Forwarding Table)において，コントローラにPacket Inする(優先度1)  
 
 
 ###host1からhost2にパケット送信
@@ -59,7 +59,7 @@ cookie=0x0, duration=6.49s, table=1, n_packets=0, n_bytes=0, priority=1 actions=
   end
 ```
 
-```@fdb.learn(packet_in.source_mac, packet_in.in_port)``` では，Packet Inしたパケットの送信元MACアドレスとIn Portを一組として学習を行う．ここで呼び出される ```add_forwarding_flow_and_packet_out``` メソッドにおいて，学習した組をForwarding Table(Table ID:1)のフローテーブに登録する．  
+```@fdb.learn(packet_in.source_mac, packet_in.in_port)``` では，Packet Inしたパケットの送信元MACアドレスとIn Portを一組として学習を行う．ここで呼び出される ```add_forwarding_flow_and_packet_out``` メソッドにおいて，学習した組をForwarding Table(Table ID:1)のフローテーブルに登録する．  
 実際にhost1からhost2へパケットを送信したときのフローテーブルの様子を以下に示す．
 
 ```
@@ -77,7 +77,7 @@ cookie=0x0, duration=13.59s, table=1, n_packets=1, n_bytes=42, priority=1 action
 ###host2からhost1にパケット送信
 続いて，host2からhost1へパケットを送信したときのフローテーブルを以下に示す．
 
-"""
+```
 $ ./bin/trema send_packets --source host2 --dest host1
 $ ./bin/trema dump_flows lsw
 cookie=0x0, duration=24.463s, table=0, n_packets=0, n_bytes=0, priority=2,dl_dst=01:00:00:00:00:00/ff:00:00:00:00:00 actions=drop
@@ -86,7 +86,7 @@ cookie=0x0, duration=24.424s, table=0, n_packets=6, n_bytes=1452, priority=1 act
 cookie=0x0, duration=24.424s, table=1, n_packets=4, n_bytes=1368, priority=3,dl_dst=ff:ff:ff:ff:ff:ff actions=FLOOD
 cookie=0x0, duration=3.797s, table=1, n_packets=0, n_bytes=0, idle_timeout=180, priority=2,in_port=2,dl_src=55:11:8c:f6:0b:4c,dl_dst=c5:2d:34:22:57:bc actions=output:1
 cookie=0x0, duration=24.424s, table=1, n_packets=2, n_bytes=84, priority=1 actions=CONTROLLER:65535
-"""
+```
 
 このとき，下記に示すエントリがフローテーブルに追加されたことが確認できる．
 ```
